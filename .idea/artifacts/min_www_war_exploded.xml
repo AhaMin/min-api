@@ -6,6 +6,19 @@
         <element id="directory" name="classes">
           <element id="module-output" name="min-www" />
         </element>
+        <element id="directory" name="lib">
+          <element id="archive" name="min-core-1.0-SNAPSHOT.jar">
+            <element id="module-output" name="min-core" />
+          </element>
+          <element id="archive" name="min-common-1.0-SNAPSHOT.jar">
+            <element id="module-output" name="min-common" />
+          </element>
+          <element id="library" level="project" name="Maven: com.google.guava:guava:18.0" />
+          <element id="library" level="project" name="Maven: com.fasterxml.jackson.core:jackson-databind:2.6.3" />
+          <element id="library" level="project" name="Maven: com.fasterxml.jackson.core:jackson-annotations:2.6.0" />
+          <element id="library" level="project" name="Maven: com.fasterxml.jackson.core:jackson-core:2.6.3" />
+          <element id="library" level="project" name="Maven: org.apache.commons:commons-lang3:3.3" />
+        </element>
       </element>
       <element id="directory" name="META-INF">
         <element id="file-copy" path="$PROJECT_DIR$/target/min-www/META-INF/MANIFEST.MF" />

@@ -6,11 +6,15 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="min-common" />
+        <module name="min-core" />
         <module name="min-www" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel target="1.8">
-      <module name="min-www" target="1.8" />
+      <module name="min-common" target="1.5" />
+      <module name="min-core" target="1.5" />
+      <module name="min-www" target="1.5" />
     </bytecodeTargetLevel>
   </component>
 </project>

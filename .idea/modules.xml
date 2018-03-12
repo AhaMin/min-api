@@ -2,6 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/../min-common/min-common.iml" filepath="$PROJECT_DIR$/../min-common/min-common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../min-core/min-core.iml" filepath="$PROJECT_DIR$/../min-core/min-core.iml" />
       <module fileurl="file://$PROJECT_DIR$/min-www.iml" filepath="$PROJECT_DIR$/min-www.iml" />
     </modules>
   </component>
