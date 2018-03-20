@@ -21,6 +21,13 @@
       <artifactId>min-core</artifactId>
       <version>1.0-SNAPSHOT</version>
     </dependency>
+
+    <dependency>
+      <groupId>commons-codec</groupId>
+      <artifactId>commons-codec</artifactId>
+      <version>1.8</version>
+    </dependency>
+
   </dependencies>
   <build>
     <finalName>min-www</finalName>
