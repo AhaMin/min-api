@@ -6,7 +6,7 @@
 
     <context:annotation-config/>
 
-    <context:component-scan base-package="base_www"/>
+    <context:component-scan base-package="base_www,base_core"/>
 
     <bean name="handlerMapping"
           class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping"/>
