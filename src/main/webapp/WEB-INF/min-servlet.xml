@@ -12,7 +12,13 @@
           class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping"/>
 
     <bean name="handlerAdapter"
-          class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter"/>
+          class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
+        <property name="customReturnValueHandlers">
+            <list>
+                <bean class="base_core.response.ResponseWrapperToJsonHandler"/>
+            </list>
+        </property>
+    </bean>
 
     <bean name="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
         <property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
