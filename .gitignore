@@ -9,5 +9,5 @@ local.config
 gen-proto
 .DS_Store
 /bin
-/min-www.iml
+/min-api.iml
 /.idea

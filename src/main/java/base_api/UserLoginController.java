@@ -1,4 +1,4 @@
-package base_www;
+package base_api;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -18,7 +18,7 @@ import base_core.user.model.UserPassword;
  * created by ewang on 2018/3/20.
  */
 @Controller
-@RequestMapping("/base_core/user")
+@RequestMapping("/user")
 public class UserLoginController {
 
     @Autowired
@@ -28,25 +28,32 @@ public class UserLoginController {
     private UserPasswordDAO userPasswordDAO;
 
     @RequestMapping("/login")
-    public ResponseWrapper login(@RequestParam("account") String account,
-                                 @RequestParam("password") String password) {
+    public ResponseWrapper login(@RequestParam(value = "account", required = false) String account,
+                                 @RequestParam(value = "password", required = false) String password) {
+        account = StringUtils.trimToNull(account);
+        password = StringUtils.trimToNull(password);
         if (StringUtils.isBlank(account) || StringUtils.isBlank(password)) {
             return new ResponseWrapper(ResponseStatus.UserIllegal, "用户名或密码为空");
         }
         User user = userDAO.getByAccount(account);
-        UserPassword userPassword;
-        if (user != null) {
-            userPassword = userPasswordDAO.getByUser(user.getId());
-            if (userPassword.getPassword().equals(encodePwd(password, userPassword.getUpdateTime()))) {
-                return new ResponseWrapper().addObject("base_core/user", user);
-            }
+        if (user == null) {
+            return new ResponseWrapper(ResponseStatus.UserIllegal, "用户不存在");
         }
-        return ResponseWrapper.EMPTY;
+        UserPassword userPassword;
+
+        userPassword = userPasswordDAO.getByUser(user.getId());
+        if (userPassword.getPassword().equals(encodePwd(password, userPassword.getUpdateTime()))) {
+            return new ResponseWrapper().addObject("user", user);
+        } else {
+            return new ResponseWrapper(ResponseStatus.UserIllegal, "密码错误");
+        }
     }
 
     @RequestMapping("/reg")
-    public ResponseWrapper reg(@RequestParam("account") String account,
-                               @RequestParam("password") String password) {
+    public ResponseWrapper reg(@RequestParam(value = "account", required = false) String account,
+                               @RequestParam(value = "password", required = false) String password) {
+        account = StringUtils.trimToNull(account);
+        password = StringUtils.trimToNull(password);
         if (StringUtils.isBlank(account) || StringUtils.isBlank(password)) {
             return new ResponseWrapper(ResponseStatus.UserIllegal, "用户名或密码为空");
         }
@@ -58,7 +65,7 @@ public class UserLoginController {
         long userId = userDAO.insert(account, "{}");
         userPasswordDAO.insertOrUpdate(userId, encodePwd(password, pwdUpdateTimeMills), pwdUpdateTimeMills);
         user = userDAO.getById(userId);
-        return new ResponseWrapper().addObject("base_core/user", user);
+        return new ResponseWrapper().addObject("user", user);
 
     }
 
