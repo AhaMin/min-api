@@ -1,4 +1,4 @@
-package base_api;
+package base_api.user;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
