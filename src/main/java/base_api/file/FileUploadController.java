@@ -29,14 +29,15 @@ public class FileUploadController {
     @Autowired
     private ImageDAO imageDAO;
 
+    @RequestMapping
     public ResponseWrapper image(HttpEntity<byte[]> httpEntity) throws IOException {
         byte[] image = httpEntity.getBody();
         if (image != null && image.length > 0) {
             long id = imageDAO.insert("{}");
-            boolean success = false;
+            boolean success;
             MagickImage magickImage = null;
-            Dimension dimension = null;
-            String format = null;
+            Dimension dimension;
+            String format;
             try {
                 // 获取尺寸和格式信息
                 magickImage = new MagickImage(new magick.ImageInfo(), image);
