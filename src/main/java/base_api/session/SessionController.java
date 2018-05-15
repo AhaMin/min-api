@@ -6,6 +6,8 @@ import base_core.session.dao.MessageDAO;
 import base_core.session.dao.SessionDAO;
 import base_core.session.model.Message;
 import base_core.session.model.Session;
+import base_core.session.service.MessageViewService;
+import base_core.session.service.SessionViewService;
 import base_core.user.dao.UserDAO;
 import base_core.user.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,12 @@ import java.util.*;
 public class SessionController {
 
     @Autowired
+    private SessionViewService sessionViewService;
+
+    @Autowired
+    private MessageViewService messageViewService;
+
+    @Autowired
     private UserDAO userDAO;
 
     @Autowired
@@ -38,25 +46,12 @@ public class SessionController {
             return new ResponseWrapper(ResponseStatus.UserIllegal, "用户不存在");
         }
 
-        List<User> userList = new ArrayList<>();
-        Map<Long, String> messageMap = new HashMap<>();
-        Map<Long, Session> sessionMap = new HashMap<>();
-        sessionDAO.findLatestSessionByUser(currentUserId, 20).stream().forEach(s -> {
-            long toUserId = s.getToUserId();
-            User user = userDAO.getById(toUserId);
-            Message message = messageDAO.getLatestBySession(s.getId());
-            if (message != null && user != null) {
-                userList.add(user);
-                sessionMap.put(user.getId(), s);
-                messageMap.put(toUserId, message.getContent());
-            }
-        });
-
-        return new ResponseWrapper()
-                .addObject("userList", userList)
-                .addObject("messageMap", messageMap)
-                .addObject("sessionMap", sessionMap);
-
+        List<Session> sessionList = sessionDAO.findLatestSessionByUser(currentUserId, 20);
+        ResponseWrapper responseWrapper = new ResponseWrapper();
+        if (!sessionList.isEmpty()) {
+            responseWrapper.addObject("sessionList", sessionViewService.buildView(sessionList));
+        }
+        return responseWrapper;
     }
 
     @RequestMapping("/message/find")
@@ -69,7 +64,11 @@ public class SessionController {
             //清除未读消息
             sessionDAO.updateUnread(session.getId(), oldUnread, 0);
         }
-        return new ResponseWrapper().addObject("messageList", messages);
+        ResponseWrapper responseWrapper = new ResponseWrapper();
+        if (!messages.isEmpty()) {
+            responseWrapper.addObject("messageList", messageViewService.buildView(messages));
+        }
+        return responseWrapper;
     }
 
     @RequestMapping("/message/send")
@@ -90,20 +89,19 @@ public class SessionController {
             sessionDAO.updateTime(toSessionId, message.getCreateTime());
             sessionDAO.updateUnread(toSessionId, oldUnread, oldUnread + 1);
         }
-        return new ResponseWrapper().addObject("message", message);
+        return new ResponseWrapper()
+                .addObject("message", messageViewService.buildView(Collections.singletonList(message)).get(0));
     }
 
     @RequestMapping("/clear/unread")
     public ResponseWrapper clearUnread(@RequestParam("userId") long userId,
                                        @RequestParam("toUserId") long toUserId) {
         Session session = sessionDAO.getByUserAndToUser(userId, toUserId);
-        if (session != null) {
-            int result = sessionDAO.updateUnread(session.getId(), session.getUnread(), 0);
-            if (result > 0) {
-                return new ResponseWrapper();
-            }
+        if (session == null) {
+            return new ResponseWrapper(ResponseStatus.NotFound, "会话不存在");
         }
-        return new ResponseWrapper(ResponseStatus.ServerError, "清理未读消息失败");
+        sessionDAO.updateUnread(session.getId(), session.getUnread(), 0);
+        return new ResponseWrapper();
     }
 
     Session findOrCreateSession(long userId, long toUserId) {
