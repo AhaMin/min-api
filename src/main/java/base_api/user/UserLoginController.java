@@ -14,10 +14,7 @@ import base_core.response.ResponseStatus;
 import base_core.response.ResponseWrapper;
 import base_core.user.dao.UserDAO;
 import base_core.user.model.User;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MultipartRequest;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.Collections;
 import java.util.List;
 
@@ -37,9 +34,6 @@ public class UserLoginController {
 
     @Autowired
     private UserPasswordService userPasswordService;
-
-    @Autowired
-    private FileUploadHelper fileUploadHelper;
 
     @RequestMapping("/login")
     public ResponseWrapper login(@RequestParam(value = "account") String account,
@@ -102,21 +96,5 @@ public class UserLoginController {
         user = userDAO.getById(userId);
         List<UserView> userViewList = userViewService.buildView(Collections.singletonList(user));
         return new ResponseWrapper().addObject("user", userViewList.get(0));
-    }
-
-    @RequestMapping("/upload/avatar")
-    public ResponseWrapper updateAvatar(HttpServletRequest httpServletRequest) {
-        MultipartFile file;
-        long imageId = 0l;
-        if (httpServletRequest instanceof MultipartRequest) {
-            file = ((MultipartRequest) httpServletRequest).getFile("file");
-            try {
-                imageId = fileUploadHelper.upload(file);
-            } catch (Exception e) {
-                return new ResponseWrapper(ResponseStatus.UploadFail, "上传失败");
-            }
-        }
-
-        return new ResponseWrapper().addObject("imageId", imageId);
     }
 }
