@@ -8,6 +8,11 @@
 
     <context:component-scan base-package="base_api,base_core"/>
 
+    <bean id="multipartResolver"
+          class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <property name="maxUploadSize" value="20971520"/> <!-- 20mb -->
+    </bean>
+
     <bean name="handlerMapping"
           class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping"/>
 

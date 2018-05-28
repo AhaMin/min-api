@@ -1,5 +1,6 @@
 package base_api.user;
 
+import base_core.constants.helper.FileUploadHelper;
 import base_core.user.service.UserPasswordService;
 import base_core.user.service.UserViewService;
 import base_core.user.view.UserView;
@@ -13,7 +14,10 @@ import base_core.response.ResponseStatus;
 import base_core.response.ResponseWrapper;
 import base_core.user.dao.UserDAO;
 import base_core.user.model.User;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartRequest;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Collections;
 import java.util.List;
 
@@ -33,6 +37,9 @@ public class UserLoginController {
 
     @Autowired
     private UserPasswordService userPasswordService;
+
+    @Autowired
+    private FileUploadHelper fileUploadHelper;
 
     @RequestMapping("/login")
     public ResponseWrapper login(@RequestParam(value = "account") String account,
@@ -76,9 +83,10 @@ public class UserLoginController {
 
     }
 
-    @RequestMapping("/update/username")
+    @RequestMapping("/update/profile")
     public ResponseWrapper updateUsername(@RequestParam("userId") long userId,
-                                          @RequestParam("username") String username) {
+                                          @RequestParam("username") String username,
+                                          @RequestParam("imageId") long imageId) {
         username = StringUtils.trimToNull(username);
         if (StringUtils.isBlank(username)) {
             return new ResponseWrapper(ResponseStatus.RequestParamValidationFail, "用户名为空");
@@ -88,10 +96,27 @@ public class UserLoginController {
             return new ResponseWrapper(ResponseStatus.UserIllegal, "用户不存在");
         }
         DataAttributeBuilder builder = new DataAttributeBuilder(user.getData())
-                .add(User.KEY_USERNAME, username);
+                .add(User.KEY_USERNAME, username)
+                .add(User.KEY_AVATAR, imageId);
         userDAO.updateData(userId, builder.buildString(), user.getData());
         user = userDAO.getById(userId);
         List<UserView> userViewList = userViewService.buildView(Collections.singletonList(user));
         return new ResponseWrapper().addObject("user", userViewList.get(0));
+    }
+
+    @RequestMapping("/upload/avatar")
+    public ResponseWrapper updateAvatar(HttpServletRequest httpServletRequest) {
+        MultipartFile file;
+        long imageId = 0l;
+        if (httpServletRequest instanceof MultipartRequest) {
+            file = ((MultipartRequest) httpServletRequest).getFile("file");
+            try {
+                imageId = fileUploadHelper.upload(file);
+            } catch (Exception e) {
+                return new ResponseWrapper(ResponseStatus.UploadFail, "上传失败");
+            }
+        }
+
+        return new ResponseWrapper().addObject("imageId", imageId);
     }
 }
