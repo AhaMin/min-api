@@ -1,6 +1,5 @@
 package base_api.user;
 
-import base_core.constants.helper.FileUploadHelper;
 import base_core.user.service.UserPasswordService;
 import base_core.user.service.UserViewService;
 import base_core.user.view.UserView;
@@ -49,7 +48,7 @@ public class UserLoginController {
         }
 
         if (userPasswordService.verifyPassword(user.getId(), password)) {
-            List<UserView> userViewList = userViewService.buildView(Collections.singletonList(user));
+            List<UserView> userViewList = userViewService.buildUserView(Collections.singletonList(user));
             return new ResponseWrapper().addObject("user", userViewList.get(0));
         } else {
             return new ResponseWrapper(ResponseStatus.UserIllegal, "密码错误");
@@ -72,7 +71,7 @@ public class UserLoginController {
         long userId = userDAO.insert(account, "{}");
         userPasswordService.createUserPassword(userId, password);
         user = userDAO.getById(userId);
-        List<UserView> userViewList = userViewService.buildView(Collections.singletonList(user));
+        List<UserView> userViewList = userViewService.buildUserView(Collections.singletonList(user));
         return new ResponseWrapper().addObject("user", userViewList.get(0));
 
     }
@@ -94,7 +93,7 @@ public class UserLoginController {
                 .add(User.KEY_AVATAR, imageId);
         userDAO.updateData(userId, builder.buildString(), user.getData());
         user = userDAO.getById(userId);
-        List<UserView> userViewList = userViewService.buildView(Collections.singletonList(user));
+        List<UserView> userViewList = userViewService.buildUserView(Collections.singletonList(user));
         return new ResponseWrapper().addObject("user", userViewList.get(0));
     }
 }

@@ -10,6 +10,7 @@ import base_core.session.service.MessageViewService;
 import base_core.session.service.SessionViewService;
 import base_core.user.dao.UserDAO;
 import base_core.user.model.User;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -48,7 +49,7 @@ public class SessionController {
 
         List<Session> sessionList = sessionDAO.findLatestSessionByUser(currentUserId, 20);
         ResponseWrapper responseWrapper = new ResponseWrapper();
-        if (!sessionList.isEmpty()) {
+        if (!CollectionUtils.isEmpty(sessionList)) {
             responseWrapper.addObject("sessionList", sessionViewService.buildView(sessionList));
         }
         return responseWrapper;
@@ -65,7 +66,7 @@ public class SessionController {
             sessionDAO.updateUnread(session.getId(), oldUnread, 0);
         }
         ResponseWrapper responseWrapper = new ResponseWrapper();
-        if (!messages.isEmpty()) {
+        if (!CollectionUtils.isEmpty(messages)) {
             responseWrapper.addObject("messageList", messageViewService.buildView(messages));
         }
         return responseWrapper;
