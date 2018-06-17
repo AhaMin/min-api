@@ -9,6 +9,7 @@ import base_core.user.model.UserAddress;
 import base_core.user.service.UserViewService;
 import base_core.user.view.UserAddressView;
 import common.DataAttributeBuilder;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -25,6 +26,7 @@ import java.util.List;
 @RequestMapping("user/address")
 public class UserAddressController {
 
+    @Autowired
     private UserAddressDAO userAddressDAO;
 
     @Autowired
@@ -39,9 +41,13 @@ public class UserAddressController {
         if (user == null) {
             return new ResponseWrapper(ResponseStatus.UserIllegal, "用户不存在");
         }
+        ResponseWrapper responseWrapper = new ResponseWrapper();
         List<UserAddress> userAddressList = userAddressDAO.findByUser(userId);
-        List<UserAddressView> userAddressViewList = userViewService.buildAddressView(userAddressList);
-        return new ResponseWrapper().addObject("addressList", userAddressViewList);
+        if (!CollectionUtils.isEmpty(userAddressList)) {
+            List<UserAddressView> userAddressViewList = userViewService.buildAddressView(userAddressList);
+            responseWrapper.addObject("addressList", userAddressViewList);
+        }
+        return responseWrapper;
     }
 
     @RequestMapping("/save")

@@ -17,7 +17,7 @@ import base_core.user.dao.UserAddressDAO;
 import base_core.user.dao.UserDAO;
 import base_core.user.model.User;
 import base_core.user.model.UserAddress;
-import org.apache.commons.collections4.CollectionUtils;
+import common.DataAttributeBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,12 +36,16 @@ public class DesignController {
     @Autowired
     private UserDAO userDAO;
 
+    @Autowired
     private DesignDAO designDAO;
 
+    @Autowired
     private DesignPreviewDAO designPreviewDAO;
 
+    @Autowired
     private DesignOrderDAO orderDAO;
 
+    @Autowired
     private UserAddressDAO userAddressDAO;
 
     @Autowired
@@ -62,9 +66,11 @@ public class DesignController {
                                              @RequestParam("previewImageId") long previewImageId,
                                              @RequestParam("detailImageId") long detailImageId,
                                              @RequestParam("designSide") int designSideValue) {
-
-        long designPreviewId = designPreviewDAO.insert(designId, previewImageId, detailImageId,
-                DesignSide.fromValue(designSideValue));
+        DataAttributeBuilder builder = new DataAttributeBuilder()
+                .add(DesignPreview.IMAGE_DETAIL, detailImageId)
+                .add(DesignPreview.IMAGE_PREVIEW, previewImageId);
+        long designPreviewId = designPreviewDAO.insert(designId,
+                DesignSide.fromValue(designSideValue), builder.buildString());
         DesignPreview designPreview = designPreviewDAO.getById(designPreviewId);
         List<DesignPreviewView> designPreviewViewList = designViewService.buildDesignPreviewView(Collections.singletonList(designPreview));
         return new ResponseWrapper().addObject("designPreview", designPreviewViewList.get(0));
